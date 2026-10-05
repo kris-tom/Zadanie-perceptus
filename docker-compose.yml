@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: perceptus-db
+    environment:
+      POSTGRES_DB: encrypted_messages
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secretpassword
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend 
+    container_name: perceptus-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+           - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/encrypted_messages
+
+  frontend:
+    build: ./frontend
+    container_name: perceptus-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
