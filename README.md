@@ -37,4 +37,3 @@ Aplikacja jest w pełni skonteneryzowana. Do jej uruchomienia wymagany jest jedy
 4.**Testowanie aplikacji**
 
   frontend:http://localhost:5173
-  backend:http://localhost:8080
