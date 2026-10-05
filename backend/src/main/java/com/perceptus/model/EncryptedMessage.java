@@ -9,18 +9,18 @@ public class EncryptedMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length =1000)
+    @Column(nullable = false, length =6000)
     private String content;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
-    private USER user;
+    private User user;
     
 
     public EncryptedMessage() {}
 
-    public EncryptedMessage(String content,USER user) {
+    public EncryptedMessage(String content,User user) {
         this.content = content;
         this.user = user;
     }
@@ -36,6 +36,6 @@ public class EncryptedMessage {
     public void setContent(String content) {
         this.content = content;
     }
-    public USER getUser() {return user;}
-    public void setUser(USER user) {this.user = user;}
+    public User getUser() {return user;}
+    public void setUser(User user) {this.user = user;}
 }

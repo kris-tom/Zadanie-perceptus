@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import com.perceptus.model.AuthRequest;
-import com.perceptus.model.USER;
+import com.perceptus.model.User;
 import com.perceptus.repository.UserRepo;
 import com.perceptus.service.JwtService;
 @RestController
@@ -29,13 +29,13 @@ public class AuthController {
     if(userRepo.findByUsername(request.getUsername()).isPresent()) {
     	return ResponseEntity.badRequest().body("Użytkownik już istnieje!");
     }
-    USER user = new USER(request.getUsername(), passwordEncoder.encode(request.getPassword()));
+    User user = new User(request.getUsername(), passwordEncoder.encode(request.getPassword()));
     userRepo.save(user);
     return ResponseEntity.ok("Zarejestrowano pomyślnie");
     }
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody AuthRequest request) {
-        USER user = userRepo.findByUsername(request.getUsername()).orElse(null);
+        User user = userRepo.findByUsername(request.getUsername()).orElse(null);
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(401).body("Błędny login lub hasło");
         }

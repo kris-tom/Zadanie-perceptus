@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.perceptus.model.EncryptedMessage;
 import com.perceptus.model.MsgReq;
-import com.perceptus.model.USER;
+import com.perceptus.model.User;
 import com.perceptus.repository.MsgRepo;
 import com.perceptus.repository.UserRepo;
 import com.perceptus.service.EncryptionService;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/msg")
-public class MsgCtrl {
+public class MessageController {
 
     @Autowired
     private EncryptionService encService;
@@ -32,7 +32,7 @@ public class MsgCtrl {
     @PostMapping("/enc")
     public ResponseEntity<String> encrypt(@Valid @RequestBody MsgReq req, Principal principal) {
         try {
-            Optional<USER> optionalUser = userRepo.findByUsername(principal.getName());
+            Optional<User> optionalUser = userRepo.findByUsername(principal.getName());
             if (optionalUser.isEmpty()) {
                 return ResponseEntity.status(401).body("Nie znaleziono użytkownika");
             }
@@ -49,7 +49,7 @@ public class MsgCtrl {
     @GetMapping("/all")
     public ResponseEntity<List<EncryptedMessage>> getAllEncrypted(Principal principal) {
         try {
-            Optional<USER> optionalUser = userRepo.findByUsername(principal.getName());
+            Optional<User> optionalUser = userRepo.findByUsername(principal.getName());
             if (optionalUser.isEmpty()) {
                 return ResponseEntity.status(401).build();
             }
