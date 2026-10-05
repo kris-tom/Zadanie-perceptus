@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+
+// Wyłącznie dekoracja tła ekranu logowania (nie są to prawdziwe dane)
+const CIPHER_DECOR = 'q8Vn3xT+uR0mZk7LpA2eYhW9cBfS1dJgO5iNvXtU4wEyHrQ6aMzK/lPb8CsDj0FoGn2VxTu7RmZk3LpAeYhW1cBfS5dJgO9iNvXtU4wEyHrQ6aMzK8lPbCsDj0FoGn+VxTu2RmZk7Lp'.repeat(14)
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '')
@@ -9,12 +12,20 @@ function App() {
 
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState('')
-  
-  // Nowe stany do obsługi zaszyfrowanych i odszyfrowanych wiadomości
+
+  // Stany do obsługi zaszyfrowanych i odszyfrowanych wiadomości
   const [encryptedMessages, setEncryptedMessages] = useState([])
   const [decryptedText, setDecryptedText] = useState('')
 
-const handleRegister = async () => {
+  // Automatyczne pobieranie wiadomości po zalogowaniu (gdy pojawi się token)
+  useEffect(() => {
+    if (token) {
+      fetchEncryptedMessages()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
+
+  const handleRegister = async () => {
     if (!username || !password) {
       setAuthStatus('Błąd: Wpisz login i hasło!')
       return
@@ -25,11 +36,11 @@ const handleRegister = async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       })
-      
+
       const text = await response.text()
-      
+
       if (response.ok) {
-        setAuthStatus(text) 
+        setAuthStatus(text)
       } else {
         setAuthStatus(`Błąd: ${text}`)
       }
@@ -40,7 +51,7 @@ const handleRegister = async () => {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      setAuthStatus('Wpisz login i hasło!')
+      setAuthStatus('Błąd: Wpisz login i hasło!')
       return
     }
     try {
@@ -53,6 +64,7 @@ const handleRegister = async () => {
         const jwt = await response.text()
         setToken(jwt)
         localStorage.setItem('token', jwt)
+        setPassword('')
         setAuthStatus('Zalogowano pomyślnie!')
       } else {
         setAuthStatus('Błąd: Nieprawidłowy login lub hasło.')
@@ -65,6 +77,8 @@ const handleRegister = async () => {
   const handleLogout = () => {
     setToken('')
     localStorage.removeItem('token')
+    setUsername('')
+    setPassword('')
     setEncryptedMessages([])
     setDecryptedText('')
     setStatus('')
@@ -73,7 +87,7 @@ const handleRegister = async () => {
 
   const handleEncrypt = async () => {
     if (!message) {
-      setStatus('Wpisz najpierw wiadomość!')
+      setStatus('Błąd: Wpisz najpierw wiadomość!')
       return
     }
 
@@ -90,7 +104,7 @@ const handleRegister = async () => {
       if (response.ok) {
         setStatus('Sukces: Wiadomość zaszyfrowana i zapisana w bazie!')
         setMessage('')
-        // Opcjonalnie: od razu odśwież listę wiadomości po dodaniu nowej
+        // Automatyczne odświeżenie listy po dodaniu nowej
         fetchEncryptedMessages()
       } else {
         setStatus('Błąd: Backend odrzucił żądanie (kod 401/403 - sprawdź token).')
@@ -100,7 +114,7 @@ const handleRegister = async () => {
     }
   }
 
-  // Funkcja pobierająca listę wszystkich zaszyfrowanych wiadomości z bazy
+  // Pobiera listę wszystkich zaszyfrowanych wiadomości z bazy
   const fetchEncryptedMessages = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/msg/all', {
@@ -110,7 +124,7 @@ const handleRegister = async () => {
       })
       if (response.ok) {
         const data = await response.json()
-        setEncryptedMessages(data)
+        setEncryptedMessages(data.reverse())
         setStatus('Sukces: Zaszyfrowane wiadomości pobrane.')
       } else {
         setStatus('Błąd: Brak uprawnień do pobrania wiadomości.')
@@ -120,7 +134,7 @@ const handleRegister = async () => {
     }
   }
 
-  // Funkcja wysyłająca jedną wybraną wiadomość do odszyfrowania na serwerze
+  // Wysyła jedną wybraną wiadomość do odszyfrowania na serwerze
   const handleDecodeSingle = async (encryptedContent) => {
     try {
       const response = await fetch('http://localhost:8080/api/msg/decode', {
@@ -135,7 +149,7 @@ const handleRegister = async () => {
       if (response.ok) {
         const text = await response.text()
         setDecryptedText(text)
-        setStatus('Pomyślnie odszyfrowano wybraną wiadomość.')
+        setStatus('Sukces: Pomyślnie odszyfrowano wybraną wiadomość.')
       } else {
         setDecryptedText('Błąd deszyfrowania.')
       }
@@ -144,94 +158,165 @@ const handleRegister = async () => {
     }
   }
 
-  return (
-    <div className="app-container">
-      <h2>Perceptus - Szyfrowanie AES-256 + Auth JWT</h2>
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(decryptedText)
+      setStatus('Sukces: Skopiowano do schowka.')
+    } catch {
+      setStatus('Błąd: Nie udało się skopiować do schowka.')
+    }
+  }
 
-      {!token ? (
-        <div className="auth-card">
-          <h3>Panel logowania</h3>
-          <input
-            type="text"
-            placeholder="Login"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="input-field"
-            aria-label="Wpisz swój login"
-          />
-          <input
-            type="password"
-            placeholder="Hasło"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-field"
-            aria-label="Wpisz swoje hasło"
-          />
-          <button onClick={handleLogin} className="btn btn-primary btn-margin-right">
-            Zaloguj
-          </button>
-          <button onClick={handleRegister} className="btn btn-secondary">
-            Zarejestruj
-          </button>
-          <p className={`status-text ${authStatus.includes('Błąd') ? 'status-error' : 'status-success'}`}>
-            {authStatus}
-          </p>
+  // ---------- EKRAN LOGOWANIA ----------
+  if (!token) {
+    return (
+      <div className="auth-screen">
+        <aside className="auth-aside">
+          <div>
+            <h1 className="brand-mark">Perceptus</h1>
+            <p className="auth-lead">
+              Wiadomości szyfrowane AES-256, dostępne tylko po zalogowaniu.
+            </p>
+          </div>
+          <div className="auth-cipher" aria-hidden="true">{CIPHER_DECOR}</div>
+        </aside>
+
+        <div className="auth-main">
+          <div className="auth-card">
+            <h2 className="auth-title">Zaloguj się</h2>
+
+            <label className="field-label" htmlFor="username">Login</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="input-field"
+              autoComplete="username"
+            />
+
+            <label className="field-label" htmlFor="password">Hasło</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-field"
+              autoComplete="current-password"
+            />
+
+            <button onClick={handleLogin} className="btn btn-primary">
+              Zaloguj
+            </button>
+
+            {authStatus && (
+              <p className={`status-text ${authStatus.includes('Błąd') ? 'status-error' : 'status-success'}`}>
+                {authStatus}
+              </p>
+            )}
+
+            <p className="auth-footer">
+              Nie masz konta?{' '}
+              <button onClick={handleRegister} className="link">
+                Zarejestruj się
+              </button>
+            </p>
+          </div>
         </div>
-      ) : (
-        <div>
-          <button onClick={handleLogout} className="btn btn-danger">
+      </div>
+    )
+  }
+
+  // ---------- PANEL PO ZALOGOWANIU ----------
+  return (
+    <div className="shell">
+      <aside className="sidebar">
+        <div className="sidebar-head">
+          <h2 className="app-brand">🔒 Perceptus</h2>
+          <button onClick={handleLogout} className="btn btn-secondary btn-sm">
             Wyloguj się
           </button>
+        </div>
 
-          <div style={{ marginBottom: '30px' }}>
+        {username && <p className="sidebar-user">Zalogowano jako {username}</p>}
+
+        <div className="sidebar-title">
+          <span>Twoje wiadomości</span>
+          <span className="badge">{encryptedMessages.length}</span>
+        </div>
+
+        {encryptedMessages.length === 0 ? (
+          <p className="hint sidebar-empty">Brak zapisanych wiadomości.</p>
+        ) : (
+          <ul className="message-list">
+            {encryptedMessages.map((msg, index) => (
+              <li key={index} className="message-item">
+                <span className="message-text" title={msg.content}>{msg.content}</span>
+                <button
+                  onClick={() => handleDecodeSingle(msg.content)}
+                  className="btn btn-secondary"
+                >
+                  Odszyfruj
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </aside>
+
+      <main className="workspace">
+        <section className="reader">
+          <div className="reader-meta">
+            <span className="badge">AES-256</span>
+            <span className="badge">Prywatne</span>
+          </div>
+          <h1 className="reader-title">Odszyfrowana wiadomość</h1>
+
+          <div className={`reader-body ${decryptedText ? '' : 'is-empty'}`}>
+            {decryptedText || 'Wybierz wiadomość z listy i kliknij „Odszyfruj”, a jej treść pojawi się tutaj.'}
+          </div>
+
+          <div className="reader-actions">
+            <button
+              onClick={() => setDecryptedText('')}
+              className="btn btn-secondary btn-sm"
+              disabled={!decryptedText}
+            >
+              Wyczyść
+            </button>
+            <button
+              onClick={handleCopy}
+              className="btn btn-secondary btn-sm"
+              disabled={!decryptedText}
+            >
+              Kopiuj
+            </button>
+          </div>
+        </section>
+
+        <section className="composer">
+          <div className="composer-row">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Wpisz wiadomość do zaszyfrowania..."
               className="textarea-field"
+              aria-label="Nowa wiadomość"
             />
-            <br />
-            <button onClick={handleEncrypt} className="btn btn-primary" style={{ marginTop: '10px' }}>
-              Zaszyfruj i Zapisz (POST)
+            <button onClick={handleEncrypt} className="btn btn-primary">
+              Zaszyfruj i zapisz
             </button>
-            <p className={`status-text ${status.includes('Błąd') ? 'status-error' : 'status-success'}`}>
-              {status}
-            </p>
           </div>
-
-          <hr className="section-divider" />
-
-          <div>
-            <button onClick={fetchEncryptedMessages} className="btn btn-success" style={{ marginBottom: '15px' }}>
-              Pobierz z bazy (Zaszyfrowane)
-            </button>
-
-            {/* Wyświetlanie wyniku po kliknięciu odszyfrowania */}
-            {decryptedText && (
-              <div style={{ padding: '15px', backgroundColor: '#e2f0d9', color: '#2e7d32', borderRadius: '5px', marginBottom: '20px', border: '1px solid #c8e6c9' }}>
-                <strong>Wynik odszyfrowania:</strong> {decryptedText}
-              </div>
+          <div className="composer-meta">
+            <p className="hint">Wiadomość zostanie zaszyfrowana przed zapisem.</p>
+            {status && (
+              <p className={`status-text ${status.includes('Błąd') ? 'status-error' : 'status-success'}`}>
+                {status}
+              </p>
             )}
-
-            <ul className="message-list">
-              {encryptedMessages.map((msg, index) => (
-                <li key={index} className="message-item" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <span style={{ wordBreak: 'break-all', fontSize: '0.9em', color: '#555' }}>
-                    <strong>Ciąg znaków:</strong> {msg.content}
-                  </span>
-                  <button 
-                    onClick={() => handleDecodeSingle(msg.content)} 
-                    className="btn btn-secondary" 
-                    style={{ alignSelf: 'flex-start', padding: '5px 10px', fontSize: '0.8em' }}
-                  >
-                    Odszyfruj tę wiadomość
-                  </button>
-                </li>
-              ))}
-            </ul>
           </div>
-        </div>
-      )}
+        </section>
+      </main>
     </div>
   )
 }
