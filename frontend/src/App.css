@@ -28,7 +28,7 @@ body {
   background: var(--bg);
 }
 
-/* ========== ISTNIEJĄCE KLASY (nazwy bez zmian) ========== */
+
 
 .app-container {
   max-width: 600px;
@@ -141,7 +141,7 @@ body {
   font-size: 12.5px;
 }
 
-/* Długi szyfrogram w jednej linii z "…" (pełny tekst w podpowiedzi title) */
+
 .message-text {
   flex: 1;
   min-width: 0;
@@ -150,7 +150,7 @@ body {
   white-space: nowrap;
 }
 
-/* ========== WSPÓLNE ELEMENTY ========== */
+
 
 .field-label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
 .hint { margin: 0; font-size: 12.5px; color: var(--text-muted); }
@@ -178,7 +178,6 @@ button.link {
 
 button.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
-/* ========== LOGOWANIE: dwie połówki ekranu ========== */
 
 .auth-screen {
   display: grid;
@@ -216,7 +215,7 @@ button.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3p
   color: var(--text-muted);
 }
 
-/* Blady szyfrogram w tle: jedyny "dekoracyjny" element, związany z tematem */
+
 .auth-cipher {
   position: absolute;
   inset: auto -8px -8px -8px;
@@ -249,7 +248,7 @@ button.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3p
 .auth-card .btn-primary { width: 100%; margin-top: 4px; }
 .auth-footer { margin: 20px 0 0; font-size: 13px; color: var(--text-muted); }
 
-/* ========== PANEL: lista po lewej, czytnik + pole pisania po prawej ========== */
+
 
 .shell {
   display: grid;
@@ -372,7 +371,7 @@ button.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3p
   .btn { width: 100%; margin-bottom: 10px; }
   .btn-margin-right { margin-right: 0; }
 
-  /* Kompaktowe przyciski w wierszach, nagłówku i pasku pisania */
+
   .message-item .btn,
   .sidebar-head .btn,
   .reader-actions .btn,

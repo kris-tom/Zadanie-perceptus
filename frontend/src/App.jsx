@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-// Wyłącznie dekoracja tła ekranu logowania (nie są to prawdziwe dane)
+
 const CIPHER_DECOR = 'q8Vn3xT+uR0mZk7LpA2eYhW9cBfS1dJgO5iNvXtU4wEyHrQ6aMzK/lPb8CsDj0FoGn2VxTu7RmZk3LpAeYhW1cBfS5dJgO9iNvXtU4wEyHrQ6aMzK8lPbCsDj0FoGn+VxTu2RmZk7Lp'.repeat(14)
 
 function App() {
@@ -13,16 +13,16 @@ function App() {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState('')
 
-  // Stany do obsługi zaszyfrowanych i odszyfrowanych wiadomości
+
   const [encryptedMessages, setEncryptedMessages] = useState([])
   const [decryptedText, setDecryptedText] = useState('')
 
-  // Automatyczne pobieranie wiadomości po zalogowaniu (gdy pojawi się token)
+
   useEffect(() => {
     if (token) {
       fetchEncryptedMessages()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [token])
 
   const handleRegister = async () => {
@@ -104,7 +104,7 @@ function App() {
       if (response.ok) {
         setStatus('Sukces: Wiadomość zaszyfrowana i zapisana w bazie!')
         setMessage('')
-        // Automatyczne odświeżenie listy po dodaniu nowej
+        
         fetchEncryptedMessages()
       } else {
         setStatus('Błąd: Backend odrzucił żądanie (kod 401/403 - sprawdź token).')
@@ -114,7 +114,7 @@ function App() {
     }
   }
 
-  // Pobiera listę wszystkich zaszyfrowanych wiadomości z bazy
+
   const fetchEncryptedMessages = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/msg/all', {
@@ -134,7 +134,7 @@ function App() {
     }
   }
 
-  // Wysyła jedną wybraną wiadomość do odszyfrowania na serwerze
+ 
   const handleDecodeSingle = async (encryptedContent) => {
     try {
       const response = await fetch('http://localhost:8080/api/msg/decode', {
@@ -167,7 +167,7 @@ function App() {
     }
   }
 
-  // ---------- EKRAN LOGOWANIA ----------
+  
   if (!token) {
     return (
       <div className="auth-screen">
@@ -227,7 +227,7 @@ function App() {
     )
   }
 
-  // ---------- PANEL PO ZALOGOWANIU ----------
+
   return (
     <div className="shell">
       <aside className="sidebar">
