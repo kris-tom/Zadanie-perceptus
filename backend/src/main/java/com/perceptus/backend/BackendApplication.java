@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @ComponentScan(basePackages = "com.perceptus")
 @EnableJpaRepositories(basePackages = "com.perceptus.repository")
-@EntityScan(basePackages = "com.perceptus.model")  
+@EntityScan(basePackages = "com.perceptus.model")
 public class BackendApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(BackendApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(BackendApplication.class, args);
+	}
 }

@@ -7,6 +7,8 @@ import com.perceptus.model.EncryptedMessage;
 import com.perceptus.model.User;
 
 import java.util.List;
+
 @Repository
 public interface MsgRepo extends JpaRepository<EncryptedMessage, Long> {
-List<EncryptedMessage> findAllByUser(User user);}
+	List<EncryptedMessage> findAllByUser(User user);
+}

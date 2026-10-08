@@ -9,53 +9,37 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date; 
-
+import java.util.Date;
 
 @Service
 public class JwtService {
 
 	@Value("${jwt.secret}")
 	private String secret;
-	
+
 	private Key getSigningKey() {
-		byte[] keyBytes =secret.getBytes(StandardCharsets.UTF_8);
+		byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
-	
+
 	public String generateToken(String username) {
-		return Jwts.builder() 
-				.setSubject(username)
-				.setIssuedAt(new Date(System.currentTimeMillis()))
+		return Jwts.builder().setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-				.signWith(getSigningKey(), SignatureAlgorithm.HS256)
-				.compact();
+				.signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
 	}
-	
+
 	public String extractUsername(String token) {
-		Claims claims = Jwts.parserBuilder()
-				.setSigningKey(getSigningKey())
-				.build()
-				.parseClaimsJws(token)
-				.getBody();
+		Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
 		return claims.getSubject();
 	}
-	
-	public boolean isTokenValid(String token){
+
+	public boolean isTokenValid(String token) {
 		try {
 			extractUsername(token);
-			return true;}
-		catch (Exception e) {
+			return true;
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
