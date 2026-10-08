@@ -119,16 +119,7 @@ Backend jest podzielony na warstwy: kontrolery obsługują żądania HTTP, serwi
 - **Responsywność:** układ dostosowuje się do telefonu, tabletu i komputera (na wąskich ekranach lista i czytnik układają się pionowo).
 - **Wydajność:** frontend jest budowany przez Vite, a backend nie pobiera danych innych użytkowników, więc odpowiedzi są niewielkie.
 
-## Ograniczenia i możliwe usprawnienia
 
-- zmiana trybu szyfrowania na AES-GCM z losowym IV dla każdej wiadomości,
-- odszyfrowywanie wiadomości po id z kontrolą właściciela po stronie backendu,
-- globalny handler błędów (`@RestControllerAdvice`),
-- paginacja listy wiadomości,
-- ograniczenie liczby prób logowania,
-- HTTPS i zarządzanie sekretami (np. menedżer sekretów zamiast zmiennych w repozytorium),
-- refresh token i wygasanie sesji,
-- testy automatyczne (jednostkowe i integracyjne).
 
 ## Autor
 
